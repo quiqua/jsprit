@@ -69,6 +69,11 @@ public class MaximumTimeInVehicleConstraint implements HardActivityConstraint {
             if (isPickupActivityForTrackedJob(newAct)) {
                 stateManager.putRouteState(route, temporaryPickupActivityStateId, newAct);
                 stateManager.putRouteState(route, temporaryNextActivityStateId, nextAct);
+            } else if (isDeliveryActivityForTrackedJob(newAct) && isPickupActivityForTrackedJob(prevAct)) {
+                double totalTravelTime = calculateTravelTime(Arrays.asList(prevAct, newAct));
+                if (totalTravelTime > maximumAllowedTravelTime) {
+                    return ConstraintsStatus.NOT_FULFILLED;
+                }
             } else if (isDeliveryActivityForTrackedJob(newAct) && !isPickupActivityForTrackedJob(prevAct)) {
                 // The deliverShipment activity (newAct) can be inserted without calculations if the previousActivity is either the
                 // start of the route or the pickupShipment itself. This part here will only be executed otherwise.
